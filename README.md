@@ -372,10 +372,34 @@ npx tsx src/cli/cli.ts poll -c config.yaml --once -f csv
 
 ### Установка
 
-1. Скопировать папку `ha-addon/` в `/addons/deye_multi_inverter/` на сервере Home Assistant
-2. В Home Assistant: **Настройки → Дополнения → Магазин дополнений → Локальные дополнения** → установить
-3. Настроить инверторы на вкладке **Конфигурация** аддона
-4. Запустить аддон
+**Вариант 1 — Локальный аддон (рекомендуется для разработки):**
+
+1. Скопировать **весь проект** на HA-машину:
+   ```bash
+   scp -r . root@homeassistant:/addons/deye_multi_inverter/
+   ```
+2. В Home Assistant: **Настройки → Дополнения → Магазин дополнений → ... (меню) → Проверить обновления**
+3. Появится **Deye Multi-Inverter Reader** в разделе «Локальные дополнения» → установить
+4. Настроить на вкладке **Конфигурация**, запустить
+
+**Вариант 2 — Git-репозиторий (рекомендуется для production):**
+
+1. Залить проект в git-репозиторий (GitHub/GitLab)
+2. В Home Assistant: **Настройки → Дополнения → Магазин дополнений → ... (меню) → Репозитории** → добавить URL репозитория
+3. Найти и установить аддон из магазина
+4. Обновления будут приходить автоматически
+
+**Вариант 3 — Только файлы аддона:**
+
+Если HA-машина имеет ограниченный диск, можно скопировать только необходимое:
+```bash
+# На dev-машине: собрать проект
+npm run build
+
+# Скопировать на HA
+scp -r ha-addon/ dist/ package.json package-lock.json root@homeassistant:/addons/deye_multi_inverter/
+ssh root@homeassistant "cd /addons/deye_multi_inverter && npm install --production"
+```
 
 ### Конфигурация аддона
 
@@ -387,10 +411,14 @@ npx tsx src/cli/cli.ts poll -c config.yaml --once -f csv
     {
       "id": "inv-1",
       "host": "192.168.1.100",
-      "port": 502,
+      "port": 8899,
       "unitId": 1,
-      "model": "deye-sun-3phase-lv",
-      "name": "Main Inverter"
+      "model": "deye-hybrid-1p",
+      "name": "Main Inverter",
+      "serialNumber": 2782125502,
+      "retries": 4,
+      "retryMinDelay": 200,
+      "retryMaxDelay": 1000
     }
   ],
   "mqtt_host": "core-mosquitto",
@@ -399,6 +427,9 @@ npx tsx src/cli/cli.ts poll -c config.yaml --once -f csv
   "discovery_prefix": "homeassistant",
   "read_interval": 10,
   "report_interval": 30,
+  "gap_tolerance": 10,
+  "stale_threshold_seconds": 120,
+  "slow_poll_multiplier": 6,
   "log_level": "info"
 }
 ```
@@ -408,7 +439,8 @@ npx tsx src/cli/cli.ts poll -c config.yaml --once -f csv
 Для каждого инвертора создаются:
 
 - **Состояние**: `deye/<inverter_id>/state` — JSON со всеми текущими значениями
-- **Discovery**: `homeassistant/sensor/<inverter_id>/<sensor_slug>/config`
+  - При наличии устаревших данных добавляется поле `_stale: true`
+- **Discovery**: `homeassistant/sensor/<inverter_id>/<sensor_slug>/config` (или `binary_sensor/` для бинарных)
 - **Доступность**: `deye/status` — `online` / `offline`
 
 ---

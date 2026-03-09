@@ -16,10 +16,15 @@ export function publishState(
 ): void {
   const stateTopic = `${topicPrefix}/${inverterId}/state`;
 
-  const state: Record<string, number | string> = {};
+  const state: Record<string, number | string | boolean> = {};
+  let hasStale = false;
   for (const reading of readings) {
     const slug = toSlug(reading.name);
     state[slug] = reading.value;
+    if (reading.stale) hasStale = true;
+  }
+  if (hasStale) {
+    state._stale = true;
   }
 
   const payload = JSON.stringify(state);

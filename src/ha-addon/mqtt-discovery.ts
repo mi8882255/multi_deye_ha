@@ -1,4 +1,4 @@
-import type { Sensor } from '../core/sensors/sensor.js';
+import { BinarySensor, type Sensor } from '../core/sensors/sensor.js';
 import type { InverterIdentity } from '../core/inverter/types.js';
 import type { MqttClientWrapper } from './mqtt-client.js';
 import { createLogger } from '../core/utils/logger.js';
@@ -76,8 +76,8 @@ export function publishDiscovery(
 }
 
 function getComponentType(sensor: Sensor): string {
-  if (sensor.unit === '' && !sensor.deviceClass) {
-    return 'sensor'; // enum/status sensors
+  if (sensor instanceof BinarySensor) {
+    return 'binary_sensor';
   }
   return 'sensor';
 }

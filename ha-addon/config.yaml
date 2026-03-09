@@ -25,6 +25,9 @@ options:
   discovery_prefix: "homeassistant"
   read_interval: 10
   report_interval: 30
+  gap_tolerance: 10
+  stale_threshold_seconds: 120
+  slow_poll_multiplier: 6
   log_level: "info"
 schema:
   inverters:
@@ -36,6 +39,10 @@ schema:
       name: "str?"
       sensors:
         - "str?"
+      serialNumber: "int?"
+      retries: "int(0,10)?"
+      retryMinDelay: "int(0,5000)?"
+      retryMaxDelay: "int(0,10000)?"
   mqtt_host: "str?"
   mqtt_port: "port?"
   mqtt_username: "str?"
@@ -44,4 +51,7 @@ schema:
   discovery_prefix: "str?"
   read_interval: "int(1,3600)?"
   report_interval: "int(1,3600)?"
+  gap_tolerance: "int(1,100)?"
+  stale_threshold_seconds: "int(1,600)?"
+  slow_poll_multiplier: "int(1,60)?"
   log_level: "list(trace|debug|info|warn|error|fatal)?"
