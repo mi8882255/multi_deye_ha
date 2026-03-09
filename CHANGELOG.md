@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0] - 2026-03-09
+## [1.1.0] - 2026-03-09
 
 ### Added
 - Multi-inverter support: 6 Deye models (3-phase, 1-phase, micro/string)
