@@ -38,7 +38,15 @@ mqtt:
   discoveryPrefix: homeassistant
 
 scheduler:
-  readInterval: 10    # seconds between reads
-  reportInterval: 30  # seconds between reports
+  readInterval: 10              # seconds between reads
+  reportInterval: 30            # seconds between reports
+  gapTolerance: 10              # max register gap to merge into one batch (default 10)
+  staleThresholdSeconds: 120    # cached value is stale after N seconds (default 120)
+  slowPollMultiplier: 6         # slow-tier sensors read every N-th cycle (default 6)
 
 logLevel: info
+
+# Per-inverter retry settings (can be added to any inverter):
+#   retries: 4              # number of retry attempts (default 4)
+#   retryMinDelay: 200      # min delay between retries in ms (default 200)
+#   retryMaxDelay: 1000     # max delay between retries in ms (default 1000)
