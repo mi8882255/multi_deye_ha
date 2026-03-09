@@ -301,7 +301,7 @@ export class SolarmanV5Client {
         'Invalid frame end marker',
       );
       // Skip this start byte and try to find another frame
-      this.responseBuffer = buf.subarray(startIdx + 1);
+      this.responseBuffer = Buffer.from(buf.subarray(startIdx + 1));
       return null;
     }
 
@@ -315,7 +315,7 @@ export class SolarmanV5Client {
         this.socket.write(this.buildTimeSyncResponse());
       }
       // Remove this frame from buffer and continue looking for data response
-      this.responseBuffer = buf.subarray(startIdx + totalLength);
+      this.responseBuffer = Buffer.from(buf.subarray(startIdx + totalLength));
       // Recursively try to parse next frame (there might be one already)
       if (this.responseBuffer.length > 0) {
         return this.tryParseFrame(this.responseBuffer);
@@ -326,7 +326,7 @@ export class SolarmanV5Client {
     // Skip non-data-response frames (keepalives, etc.)
     if (controlCode !== CONTROL_RESPONSE) {
       log.debug({ controlCode: controlCode.toString(16) }, 'Skipping non-data frame');
-      this.responseBuffer = buf.subarray(startIdx + totalLength);
+      this.responseBuffer = Buffer.from(buf.subarray(startIdx + totalLength));
       if (this.responseBuffer.length > 0) {
         return this.tryParseFrame(this.responseBuffer);
       }
