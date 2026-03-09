@@ -2,6 +2,26 @@
   "name": "deye-multi-inverter-reader",
   "version": "1.0.0",
   "description": "Multi-inverter Deye reader via Modbus TCP with CLI and Home Assistant addon support",
+  "license": "MIT",
+  "author": "mi888",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mi888/deye-multi-inverter-reader.git"
+  },
+  "homepage": "https://github.com/mi888/deye-multi-inverter-reader#readme",
+  "bugs": {
+    "url": "https://github.com/mi888/deye-multi-inverter-reader/issues"
+  },
+  "keywords": [
+    "deye",
+    "solar",
+    "inverter",
+    "modbus",
+    "solarman",
+    "home-assistant",
+    "mqtt",
+    "photovoltaic"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

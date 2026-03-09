@@ -1,3 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Debug configs and logs (contain real IPs/serial numbers)
 /debug
-/node_modules
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
 .claude

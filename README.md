@@ -415,7 +415,7 @@ ssh root@homeassistant "cd /addons/deye_multi_inverter && npm install --producti
       "unitId": 1,
       "model": "deye-hybrid-1p",
       "name": "Main Inverter",
-      "serialNumber": 2782125502,
+      "serialNumber": 1234567890,
       "retries": 4,
       "retryMinDelay": 200,
       "retryMaxDelay": 1000
