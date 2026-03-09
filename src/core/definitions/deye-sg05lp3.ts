@@ -1,4 +1,5 @@
 import type { SensorDefinition } from '../sensors/types.js';
+import { createVirtualTotals } from './common.js';
 
 /**
  * Sensor definitions for Deye SUN-*K-SG05LP3-EU (3-phase Hybrid LV).
@@ -14,6 +15,15 @@ import type { SensorDefinition } from '../sensors/types.js';
  * - Battery SOC at register 588, battery current at 591
  */
 export const DEYE_SG05LP3: SensorDefinition[] = [
+  // === Virtual totals (unified across all models) ===
+  ...createVirtualTotals({
+    solar: { address: 675 },
+    grid: { address: 625 },            // grid_total_power
+    load: { address: 653 },
+    inverter: { address: 636 },
+    battery: { address: 590 },
+  }),
+
   // =========================================================================
   // PV / DC input (2 MPPT)
   // =========================================================================
@@ -81,6 +91,18 @@ export const DEYE_SG05LP3: SensorDefinition[] = [
     unit: 'A',
     signed: false,
     deviceClass: 'current',
+    stateClass: 'measurement',
+  },
+
+  {
+    id: 'pv_total_power',
+    name: 'PV Total Power',
+    address: 675,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
     stateClass: 'measurement',
   },
 

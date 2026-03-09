@@ -1,4 +1,5 @@
 import type { SensorDefinition } from '../sensors/types.js';
+import { createVirtualTotals } from './common.js';
 
 /**
  * Sensor definitions for Deye single-phase hybrid inverters (2 MPPT).
@@ -8,6 +9,15 @@ import type { SensorDefinition } from '../sensors/types.js';
  * Based on sunsynk single_phase.py and deye-inverter-mqtt deye_hybrid.
  */
 export const DEYE_HYBRID_1P: SensorDefinition[] = [
+  // === Virtual totals (unified across all models) ===
+  ...createVirtualTotals({
+    solar: { address: 184, size: 2 },
+    grid: { address: 169 },
+    load: { address: 178, signed: true },
+    inverter: { address: 175 },
+    battery: { address: 190 },
+  }),
+
   // =========================================================================
   // PV / DC input (2 MPPT)
   // =========================================================================
@@ -75,6 +85,18 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     unit: 'A',
     signed: false,
     deviceClass: 'current',
+    stateClass: 'measurement',
+  },
+
+  {
+    id: 'pv_total_power',
+    name: 'PV Total Power',
+    address: 184,
+    size: 2,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
     stateClass: 'measurement',
   },
 

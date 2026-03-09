@@ -1,10 +1,20 @@
 import type { SensorDefinition } from '../sensors/types.js';
+import { createVirtualTotals } from './common.js';
 
 /**
  * Sensor definitions for Deye SUN-6K/8K/10K/12K (3-phase Low Voltage).
  * Based on Modbus register map from Deye documentation and sunsynk project.
  */
 export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
+  // === Virtual totals (unified across all models) ===
+  ...createVirtualTotals({
+    solar: { address: 675 },
+    grid: { address: 619 },           // external_ct_total_power
+    load: { address: 653 },
+    inverter: { address: 636 },
+    battery: { address: 590 },
+  }),
+
   // === PV / DC input ===
   {
     id: 'pv1_voltage',
@@ -65,6 +75,18 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     id: 'pv2_power',
     name: 'PV2 Power',
     address: 678,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+  },
+
+  {
+    id: 'pv_total_power',
+    name: 'PV Total Power',
+    address: 675,
     size: 1,
     factor: 1,
     unit: 'W',
@@ -186,6 +208,17 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     deviceClass: 'power',
     stateClass: 'measurement',
   },
+  {
+    id: 'external_ct_total_power',
+    name: 'External CT Total Power',
+    address: 619,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: true,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+  },
 
   // === Inverter output ===
   {
@@ -214,6 +247,18 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     id: 'inverter_l3_power',
     name: 'Inverter L3 Power',
     address: 635,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: true,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+  },
+
+  {
+    id: 'inverter_total_power',
+    name: 'Inverter Total Power',
+    address: 636,
     size: 1,
     factor: 1,
     unit: 'W',

@@ -1,4 +1,5 @@
 import type { SensorDefinition } from '../sensors/types.js';
+import { createVirtualTotals } from './common.js';
 
 /**
  * Sensor definitions for Deye micro-inverters and single-phase string inverters.
@@ -9,6 +10,13 @@ import type { SensorDefinition } from '../sensors/types.js';
  * Register range is primarily 59–116.
  */
 export const DEYE_MICRO: SensorDefinition[] = [
+  // === Virtual totals (unified across all models) ===
+  ...createVirtualTotals({
+    solar: { address: 82 },            // dc_total_power
+    inverter: { address: 86, size: 2 }, // ac_active_power
+    // no grid/load/battery on micro
+  }),
+
   // =========================================================================
   // PV / DC input (up to 4 MPPT for larger models)
   // =========================================================================

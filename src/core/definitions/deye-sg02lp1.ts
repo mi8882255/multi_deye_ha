@@ -10,10 +10,21 @@ import { DEYE_HYBRID_1P } from './deye-hybrid-1p.js';
  * - Grid total power factor is x10 instead of x1 (for >8kW models)
  */
 export const DEYE_SG02LP1: SensorDefinition[] = [
-  // Take all sensors from the 2-MPPT hybrid, but override grid_total_power factor
-  ...DEYE_HYBRID_1P.filter((s) => s.id !== 'grid_total_power'),
+  // Take all sensors from the 2-MPPT hybrid, but override grid power factor
+  ...DEYE_HYBRID_1P.filter((s) => s.id !== 'grid_total_power' && s.id !== 'vt_grid_power'),
 
   // Grid total power: factor 10 for high-power single-phase models
+  {
+    id: 'vt_grid_power',
+    name: 'Total Grid Power',
+    address: 169,
+    size: 1,
+    factor: 10,
+    unit: 'W',
+    signed: true,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+  },
   {
     id: 'grid_total_power',
     name: 'Grid Total Power',
