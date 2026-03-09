@@ -11,7 +11,7 @@ import { createVirtualTotals } from './common.js';
 export const DEYE_HYBRID_1P: SensorDefinition[] = [
   // === Virtual totals (unified across all models) ===
   ...createVirtualTotals({
-    solar: { address: 184, size: 2 },
+    solar: { address: 184 },
     grid: { address: 169 },
     load: { address: 178, signed: true },
     inverter: { address: 175 },
@@ -93,7 +93,7 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     id: 'pv_total_power',
     name: 'PV Total Power',
     address: 184,
-    size: 2,
+    size: 1,
     factor: 1,
     unit: 'W',
     signed: false,
