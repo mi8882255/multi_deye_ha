@@ -16,6 +16,7 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     load: { address: 178, signed: true },
     inverter: { address: 175 },
     battery: { address: 190 },
+    generator: { address: 166 },        // aux_power
   }),
 
   // =========================================================================

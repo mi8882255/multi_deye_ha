@@ -22,6 +22,7 @@ export const DEYE_SG05LP3: SensorDefinition[] = [
     load: { address: 653 },
     inverter: { address: 636 },
     battery: { address: 590 },
+    generator: { address: 667 },
   }),
 
   // =========================================================================

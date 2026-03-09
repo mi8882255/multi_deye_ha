@@ -15,6 +15,8 @@ export interface VirtualTotalMapping {
   inverter: { address: number; size?: number };
   /** Total battery power (signed: + charge, - discharge) */
   battery?: { address: number; size?: number };
+  /** Total generator/AUX power */
+  generator?: { address: number; size?: number };
 }
 
 /** Create unified virtual total sensors with `vt_` prefix */
@@ -78,6 +80,20 @@ export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinit
       name: 'Total Battery Power',
       address: mapping.battery.address,
       size: mapping.battery.size ?? 1,
+      factor: 1,
+      unit: 'W',
+      signed: true,
+      deviceClass: 'power',
+      stateClass: 'measurement',
+    });
+  }
+
+  if (mapping.generator) {
+    defs.push({
+      id: 'vt_generator_power',
+      name: 'Total Generator Power',
+      address: mapping.generator.address,
+      size: mapping.generator.size ?? 1,
       factor: 1,
       unit: 'W',
       signed: true,
