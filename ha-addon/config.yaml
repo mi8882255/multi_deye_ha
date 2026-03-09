@@ -1,0 +1,47 @@
+name: "Deye Multi-Inverter Reader"
+description: "Read data from multiple Deye inverters via Modbus TCP and publish to MQTT"
+version: "1.0.0"
+slug: "deye_multi_inverter"
+url: "https://github.com/example/deye-multi-inverter"
+arch:
+  - amd64
+  - aarch64
+  - armv7
+startup: application
+boot: auto
+map:
+  - config:rw
+options:
+  inverters:
+    - id: "inv-1"
+      host: "192.168.1.100"
+      port: 502
+      unitId: 1
+      model: "deye-sun-3phase-lv"
+      name: "Main Inverter"
+  mqtt_host: "core-mosquitto"
+  mqtt_port: 1883
+  topic_prefix: "deye"
+  discovery_prefix: "homeassistant"
+  read_interval: 10
+  report_interval: 30
+  log_level: "info"
+schema:
+  inverters:
+    - id: str
+      host: str
+      port: "port?"
+      unitId: "int(1,247)?"
+      model: "list(deye-sun-3phase-lv|deye-sun-3phase-hv|deye-sg05lp3|deye-hybrid-1p|deye-sg02lp1|deye-micro)"
+      name: "str?"
+      sensors:
+        - "str?"
+  mqtt_host: "str?"
+  mqtt_port: "port?"
+  mqtt_username: "str?"
+  mqtt_password: "password?"
+  topic_prefix: "str?"
+  discovery_prefix: "str?"
+  read_interval: "int(1,3600)?"
+  report_interval: "int(1,3600)?"
+  log_level: "list(trace|debug|info|warn|error|fatal)?"

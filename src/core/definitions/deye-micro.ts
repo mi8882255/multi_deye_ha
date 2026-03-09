@@ -1,0 +1,295 @@
+import type { SensorDefinition } from '../sensors/types.js';
+
+/**
+ * Sensor definitions for Deye micro-inverters and single-phase string inverters.
+ * Models: SUN-300G3, SUN-600G3, SUN-800G3, SUN-1000G3, SUN-1300G3,
+ *         SUN-1600G3, SUN-2000G3, SUN-*K-G (string).
+ *
+ * These are simpler devices: grid-tie only, no battery, no hybrid settings.
+ * Register range is primarily 59–116.
+ */
+export const DEYE_MICRO: SensorDefinition[] = [
+  // =========================================================================
+  // PV / DC input (up to 4 MPPT for larger models)
+  // =========================================================================
+  {
+    id: 'pv1_voltage',
+    name: 'PV1 Voltage',
+    address: 109,
+    size: 1,
+    factor: 0.1,
+    unit: 'V',
+    signed: false,
+    deviceClass: 'voltage',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'pv1_current',
+    name: 'PV1 Current',
+    address: 110,
+    size: 1,
+    factor: 0.1,
+    unit: 'A',
+    signed: false,
+    deviceClass: 'current',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'pv2_voltage',
+    name: 'PV2 Voltage',
+    address: 111,
+    size: 1,
+    factor: 0.1,
+    unit: 'V',
+    signed: false,
+    deviceClass: 'voltage',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'pv2_current',
+    name: 'PV2 Current',
+    address: 112,
+    size: 1,
+    factor: 0.1,
+    unit: 'A',
+    signed: false,
+    deviceClass: 'current',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'pv3_voltage',
+    name: 'PV3 Voltage',
+    address: 113,
+    size: 1,
+    factor: 0.1,
+    unit: 'V',
+    signed: false,
+    deviceClass: 'voltage',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'pv3_current',
+    name: 'PV3 Current',
+    address: 114,
+    size: 1,
+    factor: 0.1,
+    unit: 'A',
+    signed: false,
+    deviceClass: 'current',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'pv4_voltage',
+    name: 'PV4 Voltage',
+    address: 115,
+    size: 1,
+    factor: 0.1,
+    unit: 'V',
+    signed: false,
+    deviceClass: 'voltage',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'pv4_current',
+    name: 'PV4 Current',
+    address: 116,
+    size: 1,
+    factor: 0.1,
+    unit: 'A',
+    signed: false,
+    deviceClass: 'current',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'dc_total_power',
+    name: 'DC Total Power',
+    address: 82,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+  },
+
+  // =========================================================================
+  // AC output / Grid
+  // =========================================================================
+  {
+    id: 'ac_voltage',
+    name: 'AC Voltage',
+    address: 73,
+    size: 1,
+    factor: 0.1,
+    unit: 'V',
+    signed: false,
+    deviceClass: 'voltage',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'ac_current',
+    name: 'AC Current',
+    address: 76,
+    size: 1,
+    factor: 0.1,
+    unit: 'A',
+    signed: false,
+    deviceClass: 'current',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'ac_frequency',
+    name: 'AC Frequency',
+    address: 79,
+    size: 1,
+    factor: 0.01,
+    unit: 'Hz',
+    signed: false,
+    deviceClass: 'frequency',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'ac_active_power',
+    name: 'AC Active Power',
+    address: 86,
+    size: 2,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'operating_power',
+    name: 'Operating Power',
+    address: 80,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+  },
+
+  // =========================================================================
+  // Temperatures
+  // =========================================================================
+  {
+    id: 'radiator_temperature',
+    name: 'Radiator Temperature',
+    address: 90,
+    size: 1,
+    factor: 0.1,
+    unit: '°C',
+    signed: false,
+    offset: 1000,
+    deviceClass: 'temperature',
+    stateClass: 'measurement',
+  },
+  {
+    id: 'igbt_temperature',
+    name: 'IGBT Temperature',
+    address: 91,
+    size: 1,
+    factor: 0.1,
+    unit: '°C',
+    signed: false,
+    offset: 1000,
+    deviceClass: 'temperature',
+    stateClass: 'measurement',
+  },
+
+  // =========================================================================
+  // Energy totals (daily)
+  // =========================================================================
+  {
+    id: 'day_production',
+    name: 'Day Production',
+    address: 60,
+    size: 1,
+    factor: 0.1,
+    unit: 'kWh',
+    signed: false,
+    deviceClass: 'energy',
+    stateClass: 'total_increasing',
+  },
+  {
+    id: 'day_pv1_energy',
+    name: 'Day PV1 Energy',
+    address: 65,
+    size: 1,
+    factor: 0.1,
+    unit: 'kWh',
+    signed: false,
+    deviceClass: 'energy',
+    stateClass: 'total_increasing',
+  },
+  {
+    id: 'day_pv2_energy',
+    name: 'Day PV2 Energy',
+    address: 66,
+    size: 1,
+    factor: 0.1,
+    unit: 'kWh',
+    signed: false,
+    deviceClass: 'energy',
+    stateClass: 'total_increasing',
+  },
+
+  // =========================================================================
+  // Energy totals (lifetime, 32-bit)
+  // =========================================================================
+  {
+    id: 'total_production',
+    name: 'Total Production',
+    address: 63,
+    size: 2,
+    factor: 0.1,
+    unit: 'kWh',
+    signed: false,
+    deviceClass: 'energy',
+    stateClass: 'total_increasing',
+  },
+  {
+    id: 'total_pv1_energy',
+    name: 'Total PV1 Energy',
+    address: 69,
+    size: 2,
+    factor: 0.1,
+    unit: 'kWh',
+    signed: false,
+    deviceClass: 'energy',
+    stateClass: 'total_increasing',
+  },
+  {
+    id: 'total_pv2_energy',
+    name: 'Total PV2 Energy',
+    address: 71,
+    size: 2,
+    factor: 0.1,
+    unit: 'kWh',
+    signed: false,
+    deviceClass: 'energy',
+    stateClass: 'total_increasing',
+  },
+
+  // =========================================================================
+  // Status
+  // =========================================================================
+  {
+    id: 'running_status',
+    name: 'Running Status',
+    address: 59,
+    size: 1,
+    factor: 1,
+    unit: '',
+    signed: false,
+    enumMap: {
+      0: 'Standby',
+      1: 'Self Check',
+      2: 'Normal',
+      3: 'Alarm',
+      4: 'Fault',
+    },
+  },
+];

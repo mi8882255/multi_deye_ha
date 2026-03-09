@@ -1,0 +1,44 @@
+# Deye Multi-Inverter Reader — Example Configuration
+
+inverters:
+  - id: inv-1
+    host: 192.168.1.100
+    port: 502
+    unitId: 1
+    model: deye-sun-3phase-lv
+    name: "Main Inverter (6K)"
+
+  - id: inv-2
+    host: 192.168.1.100
+    port: 502
+    unitId: 2
+    model: deye-sun-3phase-lv
+    name: "Second Inverter (shared host)"
+
+  - id: inv-3
+    host: 192.168.1.101
+    port: 502
+    unitId: 1
+    model: deye-sun-3phase-hv
+    name: "Large Inverter (20K)"
+
+# Optional: filter sensors per inverter
+# sensors:
+#   - pv1_power
+#   - grid_voltage_l1
+#   - battery_soc
+
+# MQTT settings (required for HA addon, optional for CLI)
+mqtt:
+  host: localhost
+  port: 1883
+  # username: mqtt_user
+  # password: mqtt_pass
+  topicPrefix: deye
+  discoveryPrefix: homeassistant
+
+scheduler:
+  readInterval: 10    # seconds between reads
+  reportInterval: 30  # seconds between reports
+
+logLevel: info
