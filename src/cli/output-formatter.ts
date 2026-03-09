@@ -31,13 +31,14 @@ function formatTable(inverterId: string, readings: SensorReading[]): string {
     'Unit'.padStart(colUnit),
   ].join(' | ');
 
-  const rows = readings.map((r) =>
-    [
+  const rows = readings.map((r) => {
+    const staleMarker = r.stale ? '*' : '';
+    return [
       r.name.padEnd(colName),
-      String(r.value).padStart(colValue),
+      (String(r.value) + staleMarker).padStart(colValue),
       r.unit.padStart(colUnit),
-    ].join(' | '),
-  );
+    ].join(' | ');
+  });
 
   return [header, divider, headerRow, divider, ...rows, divider].join('\n');
 }
@@ -51,17 +52,18 @@ function formatJson(inverterId: string, readings: SensorReading[]): string {
       name: r.name,
       value: r.value,
       unit: r.unit,
+      ...(r.stale ? { stale: true } : {}),
     })),
   };
   return JSON.stringify(data, null, 2);
 }
 
 function formatCsv(inverterId: string, readings: SensorReading[]): string {
-  const header = 'inverter_id,sensor_id,name,value,unit,timestamp';
+  const header = 'inverter_id,sensor_id,name,value,unit,stale,timestamp';
   const ts = new Date().toISOString();
   const rows = readings.map(
     (r) =>
-      `${inverterId},${r.sensorId},"${r.name}",${r.value},${r.unit},${ts}`,
+      `${inverterId},${r.sensorId},"${r.name}",${r.value},${r.unit},${r.stale ? 'true' : 'false'},${ts}`,
   );
   return [header, ...rows].join('\n');
 }

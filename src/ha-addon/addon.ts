@@ -49,7 +49,16 @@ async function main() {
       serialNumber: inv.serialNumber,
     };
 
-    const poller = new InverterPoller(identity, sensors, pool);
+    const poller = new InverterPoller(identity, sensors, pool, {
+      gapTolerance: config.scheduler.gapTolerance,
+      staleThresholdSeconds: config.scheduler.staleThresholdSeconds,
+      slowPollMultiplier: config.scheduler.slowPollMultiplier,
+      modbusOptions: {
+        retries: inv.retries,
+        retryMinDelay: inv.retryMinDelay,
+        retryMaxDelay: inv.retryMaxDelay,
+      },
+    });
     scheduler.addPoller(poller);
 
     // Publish HA discovery
@@ -75,7 +84,7 @@ async function main() {
   const shutdown = async () => {
     log.info('Shutting down HA addon...');
     scheduler.stop();
-    await pool.closeAll();
+    pool.closeAll();
     await mqttClient.disconnect();
     process.exit(0);
   };

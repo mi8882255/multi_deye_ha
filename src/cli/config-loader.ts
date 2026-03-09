@@ -14,6 +14,9 @@ const InverterSchema = z.object({
   name: z.string().optional(),
   sensors: z.array(z.string()).optional(),
   serialNumber: z.number().optional(),
+  retries: z.number().min(0).optional(),
+  retryMinDelay: z.number().min(0).optional(),
+  retryMaxDelay: z.number().min(0).optional(),
 });
 
 const MqttSchema = z.object({
@@ -28,6 +31,9 @@ const MqttSchema = z.object({
 const SchedulerSchema = z.object({
   readInterval: z.number().min(1).default(DEFAULT_SCHEDULER.readInterval),
   reportInterval: z.number().min(1).default(DEFAULT_SCHEDULER.reportInterval),
+  gapTolerance: z.number().min(1).default(DEFAULT_SCHEDULER.gapTolerance),
+  staleThresholdSeconds: z.number().min(1).default(DEFAULT_SCHEDULER.staleThresholdSeconds),
+  slowPollMultiplier: z.number().min(1).default(DEFAULT_SCHEDULER.slowPollMultiplier),
 });
 
 const AppConfigSchema = z.object({

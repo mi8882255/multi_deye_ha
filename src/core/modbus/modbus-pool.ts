@@ -34,8 +34,9 @@ export class ModbusPool {
   }
 
   /**
-   * Execute a callback with exclusive access to a Modbus connection,
-   * with the specified unitId set.
+   * Execute a callback with exclusive access to a Modbus connection.
+   * Uses short-lived connections: connect → read → close to minimize
+   * conflict window with Solarman cloud.
    */
   async withConnection<T>(
     options: ModbusClientOptions,
@@ -45,21 +46,24 @@ export class ModbusPool {
     const entry = this.getEntry(options);
 
     return entry.mutex.runExclusive(async () => {
-      if (!entry.client.isConnected) {
+      try {
         await entry.client.connect();
+        entry.client.setUnitId(unitId);
+        return await fn(entry.client);
+      } finally {
+        entry.client.close();
       }
-      entry.client.setUnitId(unitId);
-      return fn(entry.client);
     });
   }
 
   /**
    * Close all connections in the pool.
    */
-  async closeAll(): Promise<void> {
-    const entries = [...this.pool.values()];
+  closeAll(): void {
+    for (const entry of this.pool.values()) {
+      entry.client.close();
+    }
     this.pool.clear();
-    await Promise.allSettled(entries.map((e) => e.client.close()));
     log.info('All Modbus connections closed');
   }
 }

@@ -9,6 +9,23 @@ import {
 import type { SensorDefinition, SensorValue } from './types.js';
 import { toSlug } from '../utils/slug.js';
 
+export type PollTier = 'fast' | 'slow';
+
+/** Device classes that change rapidly and should be polled every cycle */
+const FAST_DEVICE_CLASSES = new Set([
+  'power', 'current', 'voltage', 'battery', 'frequency',
+  'apparent_power', 'reactive_power',
+]);
+
+/** State classes that indicate frequently-changing measurement sensors */
+const FAST_STATE_CLASSES = new Set(['measurement']);
+
+function inferPollTier(deviceClass?: string, stateClass?: string): PollTier {
+  if (deviceClass && FAST_DEVICE_CLASSES.has(deviceClass)) return 'fast';
+  if (stateClass && FAST_STATE_CLASSES.has(stateClass)) return 'fast';
+  return 'slow';
+}
+
 export class Sensor {
   readonly id: string;
   readonly name: string;
@@ -22,6 +39,7 @@ export class Sensor {
   readonly stateClass?: string;
   readonly bitmask?: number;
   readonly offset: number;
+  readonly pollTier: PollTier;
 
   constructor(def: SensorDefinition) {
     this.id = def.id;
@@ -36,6 +54,7 @@ export class Sensor {
     this.stateClass = def.stateClass;
     this.bitmask = def.bitmask;
     this.offset = def.offset ?? 0;
+    this.pollTier = inferPollTier(def.deviceClass, def.stateClass);
   }
 
   /** All register addresses this sensor needs */

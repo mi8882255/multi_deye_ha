@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { InverterState } from '../../../src/core/inverter/inverter-state.js';
 import { Sensor } from '../../../src/core/sensors/sensor.js';
 
@@ -12,6 +12,8 @@ describe('InverterState', () => {
       factor: 1,
       unit: 'W',
       signed: false,
+      deviceClass: 'power',
+      stateClass: 'measurement',
     }),
     new Sensor({
       id: 'pv1_voltage',
@@ -21,6 +23,8 @@ describe('InverterState', () => {
       factor: 0.1,
       unit: 'V',
       signed: false,
+      deviceClass: 'voltage',
+      stateClass: 'measurement',
     }),
   ];
 
@@ -57,5 +61,46 @@ describe('InverterState', () => {
     state.updateRegisters(new Map([[674, 5000]]), sensors);
     expect(state.getValue('pv1_power')).toBe(5000);
     expect(state.getValue('nonexistent')).toBeUndefined();
+  });
+
+  it('marks readings as stale when registers are old', () => {
+    const state = new InverterState('inv-1', 5000); // 5s threshold
+
+    // Initial update at t=1000
+    vi.spyOn(Date, 'now').mockReturnValue(1000);
+    state.updateRegisters(new Map([[674, 3000]]), sensors);
+
+    // Get readings at t=1000 — not stale
+    const fresh = state.getAllReadings(sensors);
+    expect(fresh.find((r) => r.sensorId === 'pv1_power')?.stale).toBeFalsy();
+
+    // Get readings at t=7000 (6s later, past 5s threshold) — stale
+    vi.spyOn(Date, 'now').mockReturnValue(7000);
+    const stale = state.getAllReadings(sensors);
+    expect(stale.find((r) => r.sensorId === 'pv1_power')?.stale).toBe(true);
+
+    vi.restoreAllMocks();
+  });
+
+  it('readings are not stale right after update', () => {
+    const state = new InverterState('inv-1', 5000);
+
+    vi.spyOn(Date, 'now').mockReturnValue(10000);
+    state.updateRegisters(new Map([[674, 3000], [672, 2000]]), sensors);
+
+    const readings = state.getAllReadings(sensors);
+    for (const r of readings) {
+      expect(r.stale).toBeFalsy();
+    }
+
+    vi.restoreAllMocks();
+  });
+
+  it('hasCachedValues is false initially and true after update', () => {
+    const state = new InverterState('inv-1');
+    expect(state.hasCachedValues).toBe(false);
+
+    state.updateRegisters(new Map([[674, 100]]), sensors);
+    expect(state.hasCachedValues).toBe(true);
   });
 });

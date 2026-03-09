@@ -31,6 +31,8 @@ export interface SensorReading {
   value: number | string;
   unit: string;
   timestamp: number;
+  /** True when this reading comes from cache and may be outdated */
+  stale?: boolean;
 }
 
 export type SensorValue = number | string | null;

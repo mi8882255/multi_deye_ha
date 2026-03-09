@@ -39,20 +39,30 @@ export async function runPoll(options: PollOptions): Promise<void> {
       },
       sensors,
       pool,
+      {
+        gapTolerance: config.scheduler.gapTolerance,
+        staleThresholdSeconds: config.scheduler.staleThresholdSeconds,
+        slowPollMultiplier: config.scheduler.slowPollMultiplier,
+        modbusOptions: {
+          retries: inv.retries,
+          retryMinDelay: inv.retryMinDelay,
+          retryMaxDelay: inv.retryMaxDelay,
+        },
+      },
     );
     scheduler.addPoller(poller);
   }
 
   // Handle shutdown
-  const shutdown = async () => {
+  const shutdown = () => {
     log.info('Shutting down...');
     scheduler.stop();
-    await pool.closeAll();
+    pool.closeAll();
     process.exit(0);
   };
 
-  process.on('SIGINT', () => void shutdown());
-  process.on('SIGTERM', () => void shutdown());
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 
   if (once) {
     // One-shot mode
@@ -60,7 +70,7 @@ export async function runPoll(options: PollOptions): Promise<void> {
     for (const [inverterId, readings] of results) {
       console.log(formatOutput(inverterId, readings, format));
     }
-    await pool.closeAll();
+    pool.closeAll();
     return;
   }
 

@@ -19,6 +19,9 @@ const HaOptionsSchema = z.object({
       name: z.string().optional(),
       sensors: z.array(z.string()).optional(),
       serialNumber: z.number().optional(),
+      retries: z.number().min(0).optional(),
+      retryMinDelay: z.number().min(0).optional(),
+      retryMaxDelay: z.number().min(0).optional(),
     }),
   ),
   mqtt_host: z.string().default('core-mosquitto'),
@@ -29,6 +32,9 @@ const HaOptionsSchema = z.object({
   discovery_prefix: z.string().default('homeassistant'),
   read_interval: z.number().default(DEFAULT_SCHEDULER.readInterval),
   report_interval: z.number().default(DEFAULT_SCHEDULER.reportInterval),
+  gap_tolerance: z.number().min(1).default(DEFAULT_SCHEDULER.gapTolerance),
+  stale_threshold_seconds: z.number().min(1).default(DEFAULT_SCHEDULER.staleThresholdSeconds),
+  slow_poll_multiplier: z.number().min(1).default(DEFAULT_SCHEDULER.slowPollMultiplier),
   log_level: z
     .enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal'])
     .default('info'),
@@ -68,6 +74,9 @@ export function loadHaConfig(optionsPath = '/data/options.json'): AppConfig {
     scheduler: {
       readInterval: opts.read_interval,
       reportInterval: opts.report_interval,
+      gapTolerance: opts.gap_tolerance,
+      staleThresholdSeconds: opts.stale_threshold_seconds,
+      slowPollMultiplier: opts.slow_poll_multiplier,
     },
     logLevel: opts.log_level,
   };

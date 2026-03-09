@@ -8,11 +8,18 @@ import { InverterNotRespondingError, ModbusConnectionError, ModbusReadError } fr
 const log = createLogger('modbus-client');
 
 const DEFAULT_TIMEOUT = 5000;
-const DEFAULT_RETRIES = 2;
-const RECONNECT_DELAY = 3000;
+const DEFAULT_RETRIES = 4;
+const DEFAULT_RETRY_MIN_DELAY = 200;
+const DEFAULT_RETRY_MAX_DELAY = 1000;
 
 function createRawClient(): any {
   return new (ModbusRTU as any)();
+}
+
+/** Random delay between min and max ms */
+function jitterDelay(min: number, max: number): Promise<void> {
+  const ms = min + Math.random() * (max - min);
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 /**
@@ -33,6 +40,8 @@ export class ModbusClient {
   private readonly port: number;
   private readonly timeout: number;
   private readonly retries: number;
+  private readonly retryMinDelay: number;
+  private readonly retryMaxDelay: number;
   private readonly serialNumber: number;
   private currentUnitId = 1;
 
@@ -41,6 +50,8 @@ export class ModbusClient {
     this.port = options.port;
     this.timeout = options.timeout ?? DEFAULT_TIMEOUT;
     this.retries = options.retries ?? DEFAULT_RETRIES;
+    this.retryMinDelay = options.retryMinDelay ?? DEFAULT_RETRY_MIN_DELAY;
+    this.retryMaxDelay = options.retryMaxDelay ?? DEFAULT_RETRY_MAX_DELAY;
     this.serialNumber = options.serialNumber ?? 0;
 
     // Auto-detect protocol
@@ -52,17 +63,9 @@ export class ModbusClient {
       this.protocol = 'tcp';
     }
 
-    if (this.protocol === 'solarman') {
-      this.solarmanClient = new SolarmanV5Client(
-        this.host,
-        this.port,
-        this.serialNumber,
-        this.timeout,
-      );
-    } else {
-      this.rawClient = createRawClient();
-      this.rawClient.setTimeout(this.timeout);
-    }
+    // Transport is created fresh on each connect() call
+    this.rawClient = null;
+    this.solarmanClient = null;
   }
 
   get isConnected(): boolean {
@@ -76,20 +79,34 @@ export class ModbusClient {
     return `${this.host}:${this.port}`;
   }
 
+  /**
+   * Create a fresh transport and connect.
+   * Always creates a new underlying client to avoid stale socket state.
+   */
   async connect(): Promise<void> {
-    if (this.isConnected) return;
     if (this.connecting) return;
 
     this.connecting = true;
     try {
+      // Close any existing transport before creating a new one
+      this.destroyTransport();
+
       log.info(
         { host: this.host, port: this.port, protocol: this.protocol },
         'Connecting',
       );
 
       if (this.protocol === 'solarman') {
-        await this.solarmanClient!.connect();
+        this.solarmanClient = new SolarmanV5Client(
+          this.host,
+          this.port,
+          this.serialNumber,
+          this.timeout,
+        );
+        await this.solarmanClient.connect();
       } else {
+        this.rawClient = createRawClient();
+        this.rawClient.setTimeout(this.timeout);
         await this.rawClient.connectTCP(this.host, { port: this.port });
       }
 
@@ -106,41 +123,15 @@ export class ModbusClient {
     }
   }
 
-  async reconnect(): Promise<void> {
-    log.warn({ host: this.host, port: this.port }, 'Reconnecting...');
-
-    if (this.protocol === 'solarman') {
-      this.solarmanClient?.close();
-      this.solarmanClient = new SolarmanV5Client(
-        this.host,
-        this.port,
-        this.serialNumber,
-        this.timeout,
-      );
-    } else {
-      try {
-        this.rawClient.close(() => {});
-      } catch {
-        // ignore close errors
-      }
-      this.rawClient = createRawClient();
-      this.rawClient.setTimeout(this.timeout);
-    }
-
-    this.connected = false;
-    await new Promise((r) => setTimeout(r, RECONNECT_DELAY));
-    await this.connect();
-  }
-
   setUnitId(unitId: number): void {
     this.currentUnitId = unitId;
-    if (this.protocol === 'tcp') {
+    if (this.protocol === 'tcp' && this.rawClient) {
       this.rawClient.setID(unitId);
     }
   }
 
   /**
-   * Read holding registers with retries.
+   * Read holding registers with retries and jitter delay.
    */
   async readHoldingRegisters(
     address: number,
@@ -151,7 +142,7 @@ export class ModbusClient {
     for (let attempt = 0; attempt <= this.retries; attempt++) {
       try {
         if (!this.isConnected) {
-          await this.reconnect();
+          await this.connect();
         }
 
         if (this.protocol === 'solarman') {
@@ -171,13 +162,14 @@ export class ModbusClient {
           'Read failed',
         );
 
-        // Don't reconnect for data-level errors (logger is fine, inverter isn't)
+        // Don't retry for data-level errors (logger is fine, inverter isn't)
         if (lastErr instanceof InverterNotRespondingError) {
           throw lastErr;
         }
 
         if (attempt < this.retries) {
-          await this.reconnect();
+          this.close();
+          await jitterDelay(this.retryMinDelay, this.retryMaxDelay);
         }
       }
     }
@@ -185,16 +177,23 @@ export class ModbusClient {
     throw new ModbusReadError(address, count, lastErr);
   }
 
-  async close(): Promise<void> {
+  close(): void {
+    this.destroyTransport();
+    this.connected = false;
+  }
+
+  private destroyTransport(): void {
     try {
       if (this.protocol === 'solarman') {
         this.solarmanClient?.close();
-      } else {
-        this.rawClient?.close(() => {});
+        this.solarmanClient = null;
+      } else if (this.rawClient) {
+        this.rawClient.close(() => {});
+        this.rawClient = null;
       }
-      this.connected = false;
     } catch {
-      // ignore
+      // ignore close errors
     }
+    this.connected = false;
   }
 }

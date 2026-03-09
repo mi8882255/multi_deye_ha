@@ -1,4 +1,4 @@
-import type { Sensor } from './sensor.js';
+import type { Sensor, PollTier } from './sensor.js';
 
 export class SensorRegistry {
   private byId = new Map<string, Sensor>();
@@ -38,6 +38,24 @@ export class SensorRegistry {
 
   getAll(): Sensor[] {
     return [...this.byId.values()];
+  }
+
+  /** Get sensors matching the given poll tier */
+  getSensorsByTier(tier: PollTier): Sensor[] {
+    return this.getAll().filter((s) => s.pollTier === tier);
+  }
+
+  /** Get unique register addresses for sensors of the given poll tier */
+  getAddressesByTier(tier: PollTier): number[] {
+    const addrs = new Set<number>();
+    for (const sensor of this.byId.values()) {
+      if (sensor.pollTier === tier) {
+        for (const addr of sensor.addresses) {
+          addrs.add(addr);
+        }
+      }
+    }
+    return [...addrs].sort((a, b) => a - b);
   }
 
   get size(): number {
