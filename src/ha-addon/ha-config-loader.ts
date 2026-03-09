@@ -3,10 +3,13 @@ import { z } from 'zod';
 import type { AppConfig } from '../shared/config.js';
 import { DEFAULT_SCHEDULER, DEFAULT_MQTT } from '../shared/config.js';
 import { ConfigValidationError } from '../shared/errors.js';
+import { createLogger } from '../core/utils/logger.js';
+
+const log = createLogger('ha-config-loader');
 
 /**
  * HA addon receives config from /data/options.json.
- * MQTT credentials come from the supervisor API.
+ * MQTT credentials come from the Supervisor API automatically.
  */
 const HaOptionsSchema = z.object({
   inverters: z.array(
@@ -39,6 +42,51 @@ const HaOptionsSchema = z.object({
     .enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal'])
     .default('info'),
 });
+
+interface SupervisorMqttResponse {
+  data: {
+    host: string;
+    port: number;
+    ssl: boolean;
+    username: string;
+    password: string;
+    protocol: string;
+    addon: string;
+  };
+}
+
+/**
+ * Fetch MQTT credentials from the HA Supervisor API.
+ * Available when addon declares `services: [mqtt:want]` in config.yaml.
+ */
+async function fetchSupervisorMqtt(): Promise<{ host: string; port: number; username: string; password: string } | null> {
+  const token = process.env.SUPERVISOR_TOKEN;
+  if (!token) {
+    log.debug('No SUPERVISOR_TOKEN, skipping Supervisor MQTT discovery');
+    return null;
+  }
+
+  try {
+    const res = await fetch('http://supervisor/services/mqtt', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) {
+      log.warn({ status: res.status }, 'Supervisor MQTT service not available');
+      return null;
+    }
+    const json = (await res.json()) as SupervisorMqttResponse;
+    log.info({ host: json.data.host, port: json.data.port }, 'Got MQTT credentials from Supervisor');
+    return {
+      host: json.data.host,
+      port: json.data.port,
+      username: json.data.username,
+      password: json.data.password,
+    };
+  } catch (err) {
+    log.warn({ err: (err as Error).message }, 'Failed to fetch Supervisor MQTT config');
+    return null;
+  }
+}
 
 export function loadHaConfig(optionsPath = '/data/options.json'): AppConfig {
   let raw: unknown;
@@ -80,4 +128,24 @@ export function loadHaConfig(optionsPath = '/data/options.json'): AppConfig {
     },
     logLevel: opts.log_level,
   };
+}
+
+/**
+ * Load HA config with automatic MQTT credential discovery from Supervisor.
+ */
+export async function loadHaConfigWithMqtt(optionsPath = '/data/options.json'): Promise<AppConfig> {
+  const config = loadHaConfig(optionsPath);
+
+  // If no username provided, try to get from Supervisor API
+  if (!config.mqtt?.username) {
+    const supervisorMqtt = await fetchSupervisorMqtt();
+    if (supervisorMqtt && config.mqtt) {
+      config.mqtt.host = supervisorMqtt.host;
+      config.mqtt.port = supervisorMqtt.port;
+      config.mqtt.username = supervisorMqtt.username;
+      config.mqtt.password = supervisorMqtt.password;
+    }
+  }
+
+  return config;
 }

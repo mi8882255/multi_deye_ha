@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { loadHaConfig } from './ha-config-loader.js';
+import { loadHaConfigWithMqtt } from './ha-config-loader.js';
 import { MqttClientWrapper } from './mqtt-client.js';
 import { publishDiscovery } from './mqtt-discovery.js';
 import { publishState } from './mqtt-state-publisher.js';
@@ -15,7 +15,7 @@ const log = createLogger('ha-addon');
 async function main() {
   log.info('Starting Deye HA Addon');
 
-  const config = loadHaConfig();
+  const config = await loadHaConfigWithMqtt();
 
   if (!config.mqtt) {
     throw new Error('MQTT configuration is required for HA addon');
