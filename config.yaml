@@ -1,6 +1,6 @@
 name: "Deye Multi-Inverter Reader"
 description: "Read data from multiple Deye inverters via Modbus TCP and publish to MQTT"
-version: "1.2.2"
+version: "1.2.3"
 slug: "deye_multi_inverter"
 url: "https://github.com/mi8882255/multi_deye_ha"
 arch:

@@ -16,7 +16,7 @@ export const DEYE_SG02LP1: SensorDefinition[] = [
   // Grid total power: factor 10 for high-power single-phase models
   {
     id: 'vt_grid_power',
-    name: 'Total Grid Power',
+    name: 'VT Grid Power',
     address: 169,
     size: 1,
     factor: 10,

@@ -24,7 +24,7 @@ export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinit
   const defs: SensorDefinition[] = [
     {
       id: 'vt_solar_power',
-      name: 'Total Solar Power',
+      name: 'VT Solar Power',
       address: mapping.solar.address,
       size: mapping.solar.size ?? 1,
       factor: 1,
@@ -35,7 +35,7 @@ export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinit
     },
     {
       id: 'vt_inverter_power',
-      name: 'Total Inverter Power',
+      name: 'VT Inverter Power',
       address: mapping.inverter.address,
       size: mapping.inverter.size ?? 1,
       factor: 1,
@@ -49,7 +49,7 @@ export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinit
   if (mapping.grid) {
     defs.push({
       id: 'vt_grid_power',
-      name: 'Total Grid Power',
+      name: 'VT Grid Power',
       address: mapping.grid.address,
       size: mapping.grid.size ?? 1,
       factor: mapping.grid.factor ?? 1,
@@ -63,7 +63,7 @@ export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinit
   if (mapping.load) {
     defs.push({
       id: 'vt_load_power',
-      name: 'Total Load Power',
+      name: 'VT Load Power',
       address: mapping.load.address,
       size: mapping.load.size ?? 1,
       factor: 1,
@@ -77,7 +77,7 @@ export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinit
   if (mapping.battery) {
     defs.push({
       id: 'vt_battery_power',
-      name: 'Total Battery Power',
+      name: 'VT Battery Power',
       address: mapping.battery.address,
       size: mapping.battery.size ?? 1,
       factor: 1,
@@ -91,7 +91,7 @@ export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinit
   if (mapping.generator) {
     defs.push({
       id: 'vt_generator_power',
-      name: 'Total Generator Power',
+      name: 'VT Generator Power',
       address: mapping.generator.address,
       size: mapping.generator.size ?? 1,
       factor: 1,
