@@ -23,6 +23,8 @@ export interface SensorDefinition {
   enumMap?: Record<number, string>;
   /** Offset to subtract (e.g. for temperatures: raw - 1000 → °C) */
   offset?: number;
+  /** Computed sensor: sum raw values at these addresses (address field ignored) */
+  sumOf?: number[];
 }
 
 export interface SensorReading {

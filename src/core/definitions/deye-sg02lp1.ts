@@ -11,7 +11,33 @@ import { DEYE_HYBRID_1P } from './deye-hybrid-1p.js';
  */
 export const DEYE_SG02LP1: SensorDefinition[] = [
   // Take all sensors from the 2-MPPT hybrid, but override grid power factor
-  ...DEYE_HYBRID_1P.filter((s) => s.id !== 'grid_total_power' && s.id !== 'vt_grid_power'),
+  ...DEYE_HYBRID_1P.filter((s) => s.id !== 'grid_total_power' && s.id !== 'vt_grid_power' && s.id !== 'vt_solar_power' && s.id !== 'pv_total_power'),
+
+  // Override: PV Total = PV1 + PV2 + PV3
+  {
+    id: 'vt_solar_power',
+    name: 'VT Solar Power',
+    address: 0,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+    sumOf: [186, 187, 188],
+  },
+  {
+    id: 'pv_total_power',
+    name: 'PV Total Power',
+    address: 0,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    deviceClass: 'power',
+    stateClass: 'measurement',
+    sumOf: [186, 187, 188],
+  },
 
   // Grid total power: factor 10 for high-power single-phase models
   {

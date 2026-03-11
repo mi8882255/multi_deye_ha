@@ -17,7 +17,7 @@ import { createVirtualTotals } from './common.js';
 export const DEYE_SG05LP3: SensorDefinition[] = [
   // === Virtual totals (unified across all models) ===
   ...createVirtualTotals({
-    solar: { address: 675 },
+    solar: { sumOf: [672, 673] },
     grid: { address: 625 },            // grid_total_power
     load: { address: 653 },
     inverter: { address: 636 },
@@ -98,13 +98,14 @@ export const DEYE_SG05LP3: SensorDefinition[] = [
   {
     id: 'pv_total_power',
     name: 'PV Total Power',
-    address: 675,
+    address: 0,
     size: 1,
     factor: 1,
     unit: 'W',
     signed: false,
     deviceClass: 'power',
     stateClass: 'measurement',
+    sumOf: [672, 673],
   },
 
   // =========================================================================

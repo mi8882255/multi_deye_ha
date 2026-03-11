@@ -8,7 +8,7 @@ import { createVirtualTotals } from './common.js';
 export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
   // === Virtual totals (unified across all models) ===
   ...createVirtualTotals({
-    solar: { address: 675 },
+    solar: { sumOf: [674, 678] },
     grid: { address: 619 },           // external_ct_total_power
     load: { address: 653 },
     inverter: { address: 636 },
@@ -86,13 +86,14 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
   {
     id: 'pv_total_power',
     name: 'PV Total Power',
-    address: 675,
+    address: 0,
     size: 1,
     factor: 1,
     unit: 'W',
     signed: false,
     deviceClass: 'power',
     stateClass: 'measurement',
+    sumOf: [674, 678],
   },
 
   // === Grid / AC output ===

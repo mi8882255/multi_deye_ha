@@ -1,5 +1,5 @@
 import type { SensorDefinition } from '../sensors/types.js';
-import { Sensor, EnumSensor, TempSensor } from '../sensors/sensor.js';
+import { Sensor, EnumSensor, TempSensor, MathSensor } from '../sensors/sensor.js';
 import { DEYE_SUN_3PHASE_LV } from './deye-sun-3phase-lv.js';
 import { DEYE_SUN_3PHASE_HV } from './deye-sun-3phase-hv.js';
 import { DEYE_SG05LP3 } from './deye-sg05lp3.js';
@@ -44,6 +44,9 @@ export function buildSensors(
   }
 
   return defs.map((def) => {
+    if (def.sumOf) {
+      return new MathSensor(def, def.sumOf, (vals) => vals.reduce((a, b) => a + b, 0));
+    }
     if (def.enumMap) {
       return new EnumSensor(def as SensorDefinition & { enumMap: Record<number, string> });
     }

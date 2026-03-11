@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.5] - 2026-03-11
+
+### Fixed
+- `pv_total_power` and `vt_solar_power` now computed as sum of individual PV power registers via `MathSensor` — Deye has no dedicated "PV Total" register
+  - `deye-hybrid-1p`: was reading register 184 (= `battery_soc`), showed 99% as 99W — now `sumOf: [186, 187]` (PV1+PV2)
+  - `deye-sg05lp3`: was reading register 675 (= PV4 Power), always 0 on 2-MPPT — now `sumOf: [672, 673]` (PV1+PV2)
+  - `deye-sun-3phase-lv`: was reading register 675 (= PV4 Power) — now `sumOf: [674, 678]` (PV1+PV2)
+  - `deye-sun-3phase-hv`: overrides LV with `sumOf: [674, 678, 682, 686]` (PV1-PV4)
+  - `deye-sg02lp1`: overrides hybrid-1p with `sumOf: [186, 187, 188]` (PV1-PV3)
+  - `deye-micro`: unchanged (register 82 = real `dc_total_power`)
+
+### Added
+- `sumOf` field in `SensorDefinition` — declarative computed sensors (sum of registers)
+- `buildSensors()` automatically creates `MathSensor` instances for definitions with `sumOf`
+- `VirtualTotalMapping.solar` now accepts `{ sumOf: number[] }` for computed totals
+
 ## [1.2.4] - 2026-03-11
 
 ### Fixed

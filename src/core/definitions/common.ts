@@ -5,8 +5,8 @@ import type { SensorDefinition } from '../sensors/types.js';
  * Each entry maps a virtual sensor to a model-specific register address.
  */
 export interface VirtualTotalMapping {
-  /** Total PV/DC power */
-  solar: { address: number; size?: number };
+  /** Total PV/DC power (register address or sumOf for computed) */
+  solar: { address: number; size?: number } | { sumOf: number[] };
   /** Total grid power (signed: + import, - export) */
   grid?: { address: number; size?: number; factor?: number };
   /** Total load/consumption */
@@ -21,18 +21,33 @@ export interface VirtualTotalMapping {
 
 /** Create unified virtual total sensors with `vt_` prefix */
 export function createVirtualTotals(mapping: VirtualTotalMapping): SensorDefinition[] {
+  const solarDef: SensorDefinition = 'sumOf' in mapping.solar
+    ? {
+        id: 'vt_solar_power',
+        name: 'VT Solar Power',
+        address: 0,
+        size: 1,
+        factor: 1,
+        unit: 'W',
+        signed: false,
+        deviceClass: 'power',
+        stateClass: 'measurement',
+        sumOf: mapping.solar.sumOf,
+      }
+    : {
+        id: 'vt_solar_power',
+        name: 'VT Solar Power',
+        address: mapping.solar.address,
+        size: mapping.solar.size ?? 1,
+        factor: 1,
+        unit: 'W',
+        signed: false,
+        deviceClass: 'power',
+        stateClass: 'measurement',
+      };
+
   const defs: SensorDefinition[] = [
-    {
-      id: 'vt_solar_power',
-      name: 'VT Solar Power',
-      address: mapping.solar.address,
-      size: mapping.solar.size ?? 1,
-      factor: 1,
-      unit: 'W',
-      signed: false,
-      deviceClass: 'power',
-      stateClass: 'measurement',
-    },
+    solarDef,
     {
       id: 'vt_inverter_power',
       name: 'VT Inverter Power',
