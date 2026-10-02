@@ -25,6 +25,14 @@ export interface SensorDefinition {
   offset?: number;
   /** Computed sensor: sum raw values at these addresses (address field ignored) */
   sumOf?: number[];
+  /**
+   * Marks a `total`-class energy counter that resets to ~0 once per local day
+   * (e.g. day_pv_energy). Enables reset detection: a drop in value is treated
+   * as a legitimate meter reset and published with a fresh `last_reset`
+   * timestamp, instead of letting HA's total_increasing heuristic mistake it
+   * for an anomaly and produce a false negative spike in the Energy dashboard.
+   */
+  dailyReset?: boolean;
 }
 
 export interface SensorReading {
@@ -35,6 +43,8 @@ export interface SensorReading {
   timestamp: number;
   /** True when this reading comes from cache and may be outdated */
   stale?: boolean;
+  /** For dailyReset sensors: epoch ms of the last detected counter reset */
+  lastReset?: number;
 }
 
 export type SensorValue = number | string | null;

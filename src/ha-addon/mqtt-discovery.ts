@@ -20,6 +20,7 @@ interface DiscoveryPayload {
   device_class?: string;
   state_class?: string;
   availability_topic: string;
+  last_reset_value_template?: string;
 }
 
 /**
@@ -61,6 +62,9 @@ export function publishDiscovery(
     }
     if (sensor.stateClass) {
       payload.state_class = sensor.stateClass;
+    }
+    if (sensor.dailyReset) {
+      payload.last_reset_value_template = `{{ value_json.${sensor.slug}_last_reset }}`;
     }
 
     const discoveryTopic = `${discoveryPrefix}/${componentType}/${deviceId}/${sensor.slug}/config`;

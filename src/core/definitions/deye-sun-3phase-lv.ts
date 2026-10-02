@@ -408,7 +408,8 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_grid_export',
@@ -419,7 +420,8 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_pv_energy',
@@ -430,7 +432,8 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_load_energy',
@@ -441,7 +444,8 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_battery_charge',
@@ -452,7 +456,8 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_battery_discharge',
@@ -463,7 +468,8 @@ export const DEYE_SUN_3PHASE_LV: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'total_pv_energy',

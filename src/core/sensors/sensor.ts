@@ -40,6 +40,7 @@ export class Sensor {
   readonly bitmask?: number;
   readonly offset: number;
   readonly pollTier: PollTier;
+  readonly dailyReset: boolean;
 
   constructor(def: SensorDefinition) {
     this.id = def.id;
@@ -55,6 +56,7 @@ export class Sensor {
     this.bitmask = def.bitmask;
     this.offset = def.offset ?? 0;
     this.pollTier = inferPollTier(def.deviceClass, def.stateClass);
+    this.dailyReset = def.dailyReset ?? false;
   }
 
   /** All register addresses this sensor needs */

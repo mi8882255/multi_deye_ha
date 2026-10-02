@@ -42,4 +42,21 @@ describe('publishState', () => {
     const [, payload] = client.publish.mock.calls[0];
     expect(JSON.parse(payload)._stale).toBeUndefined();
   });
+
+  it('publishes last_reset as an ISO timestamp under a _last_reset key', () => {
+    const client = fakeClient();
+    const resetMs = Date.parse('2026-10-02T00:00:05.000Z');
+    publishState(client, 'inv1', [reading({ lastReset: resetMs })], 'deye');
+
+    const [, payload] = client.publish.mock.calls[0];
+    expect(JSON.parse(payload).day_pv_energy_last_reset).toBe(new Date(resetMs).toISOString());
+  });
+
+  it('does not add a _last_reset key when lastReset is absent', () => {
+    const client = fakeClient();
+    publishState(client, 'inv1', [reading({})], 'deye');
+
+    const [, payload] = client.publish.mock.calls[0];
+    expect(JSON.parse(payload).day_pv_energy_last_reset).toBeUndefined();
+  });
 });

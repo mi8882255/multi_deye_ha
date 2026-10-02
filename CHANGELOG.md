@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.7] - 2026-10-02
+
+### Changed
+- All daily energy counters (`day_pv_energy`, `day_battery_charge`, `day_battery_discharge`, `day_grid_import`, `day_grid_export`, `day_load_energy`, `day_generator_energy`, `day_production`, `day_pv1_energy`, `day_pv2_energy`) switched from `state_class: total_increasing` to `state_class: total`, with a `last_reset` timestamp published alongside each one
+- Lifetime 32-bit `total_*` counters are unaffected and keep `state_class: total_increasing`
+
+### Added
+- Daily counter reset detection in `InverterState`: a drop from a meaningful value (≥0.5 kWh) to near-zero (<0.5 kWh) is recognized as the inverter's local-midnight counter reset and stamps a fresh `last_reset`. Small rounding dips are ignored and don't move it
+- MQTT discovery now sets `last_reset_value_template` for these sensors; the state payload carries each one's reset time under a `<slug>_last_reset` key (ISO 8601)
+
+### Why
+`total_increasing` makes HA infer resets purely from "value went down", which occasionally misfires on these inverters' daily counters and inserts a large false negative delta into the Energy dashboard for that day (e.g. -167 kWh solar). `total` + an explicit `last_reset` tells HA about the reset directly, removing the guesswork.
+
 ## [1.2.6] - 2026-10-02
 
 ### Fixed

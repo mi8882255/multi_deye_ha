@@ -219,7 +219,8 @@ export const DEYE_MICRO: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_pv1_energy',
@@ -230,7 +231,8 @@ export const DEYE_MICRO: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_pv2_energy',
@@ -241,7 +243,8 @@ export const DEYE_MICRO: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
 
   // =========================================================================

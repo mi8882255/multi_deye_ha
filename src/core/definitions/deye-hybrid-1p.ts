@@ -535,7 +535,8 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_battery_charge',
@@ -546,7 +547,8 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_battery_discharge',
@@ -557,7 +559,8 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_grid_import',
@@ -568,7 +571,8 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_grid_export',
@@ -579,7 +583,8 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
   {
     id: 'day_load_energy',
@@ -590,7 +595,8 @@ export const DEYE_HYBRID_1P: SensorDefinition[] = [
     unit: 'kWh',
     signed: false,
     deviceClass: 'energy',
-    stateClass: 'total_increasing',
+    stateClass: 'total',
+    dailyReset: true,
   },
 
   // =========================================================================

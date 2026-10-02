@@ -31,6 +31,9 @@ export function publishState(
     } else {
       state[slug] = reading.value;
     }
+    if (reading.lastReset !== undefined) {
+      state[`${slug}_last_reset`] = new Date(reading.lastReset).toISOString();
+    }
   }
   if (hasStale) {
     state._stale = true;

@@ -104,3 +104,78 @@ describe('InverterState', () => {
     expect(state.hasCachedValues).toBe(true);
   });
 });
+
+describe('InverterState dailyReset detection', () => {
+  const dailySensor = new Sensor({
+    id: 'day_pv_energy',
+    name: 'Day PV Energy',
+    address: 529,
+    size: 1,
+    factor: 0.1,
+    unit: 'kWh',
+    signed: false,
+    deviceClass: 'energy',
+    stateClass: 'total',
+    dailyReset: true,
+  });
+
+  it('sets an initial last_reset on first reading', () => {
+    const state = new InverterState('inv-1');
+    vi.spyOn(Date, 'now').mockReturnValue(1000);
+
+    const readings = state.updateRegisters(new Map([[529, 227]]), [dailySensor]);
+    expect(readings[0].lastReset).toBe(1000);
+
+    vi.restoreAllMocks();
+  });
+
+  it('does not move last_reset when the value only increases', () => {
+    const state = new InverterState('inv-1');
+    vi.spyOn(Date, 'now').mockReturnValue(1000);
+    state.updateRegisters(new Map([[529, 50]]), [dailySensor]);
+
+    vi.spyOn(Date, 'now').mockReturnValue(2000);
+    const readings = state.updateRegisters(new Map([[529, 227]]), [dailySensor]);
+    expect(readings[0].lastReset).toBe(1000);
+
+    vi.restoreAllMocks();
+  });
+
+  it('moves last_reset when the counter drops from a high value to near zero', () => {
+    const state = new InverterState('inv-1');
+    vi.spyOn(Date, 'now').mockReturnValue(1000);
+    state.updateRegisters(new Map([[529, 227]]), [dailySensor]); // 22.7 kWh
+
+    vi.spyOn(Date, 'now').mockReturnValue(2000);
+    const readings = state.updateRegisters(new Map([[529, 0]]), [dailySensor]); // midnight reset
+    expect(readings[0].lastReset).toBe(2000);
+    expect(readings[0].value).toBe(0);
+
+    vi.restoreAllMocks();
+  });
+
+  it('does not treat small rounding dips as a reset', () => {
+    const state = new InverterState('inv-1');
+    vi.spyOn(Date, 'now').mockReturnValue(1000);
+    state.updateRegisters(new Map([[529, 227]]), [dailySensor]); // 22.7 kWh
+
+    vi.spyOn(Date, 'now').mockReturnValue(2000);
+    const readings = state.updateRegisters(new Map([[529, 226]]), [dailySensor]); // 22.6 kWh, tiny dip
+    expect(readings[0].lastReset).toBe(1000); // unchanged
+
+    vi.restoreAllMocks();
+  });
+
+  it('getAllReadings carries last_reset through for cached/stale values', () => {
+    const state = new InverterState('inv-1', 5000);
+    vi.spyOn(Date, 'now').mockReturnValue(1000);
+    state.updateRegisters(new Map([[529, 50]]), [dailySensor]);
+
+    vi.spyOn(Date, 'now').mockReturnValue(7000); // past stale threshold
+    const readings = state.getAllReadings([dailySensor]);
+    expect(readings[0].lastReset).toBe(1000);
+    expect(readings[0].stale).toBe(true);
+
+    vi.restoreAllMocks();
+  });
+});
