@@ -16,12 +16,21 @@ export function publishState(
 ): void {
   const stateTopic = `${topicPrefix}/${inverterId}/state`;
 
-  const state: Record<string, number | string | boolean> = {};
+  const state: Record<string, number | string | boolean | null> = {};
   let hasStale = false;
   for (const reading of readings) {
     const slug = toSlug(reading.name);
-    state[slug] = reading.value;
-    if (reading.stale) hasStale = true;
+    // Stale cached values must not be republished as fresh numbers: HA treats
+    // any decrease on a total_increasing sensor as a meter reset, and a stale
+    // reading overtaken by a lower fresh one would trigger a false negative
+    // spike in the Energy dashboard. Publishing null renders as unknown/
+    // unavailable in HA instead of a misleading number.
+    if (reading.stale) {
+      state[slug] = null;
+      hasStale = true;
+    } else {
+      state[slug] = reading.value;
+    }
   }
   if (hasStale) {
     state._stale = true;

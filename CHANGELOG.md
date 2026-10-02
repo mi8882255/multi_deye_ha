@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.6] - 2026-10-02
+
+### Fixed
+- Stale cached readings are no longer republished to MQTT as normal numbers — they now publish as `null` (HA renders this as unknown/unavailable). Previously a stale value could be overtaken by a lower fresh reading, which HA's `total_increasing` state class interprets as a meter reset, producing false negative spikes in the Energy dashboard (e.g. negative daily solar/battery kWh)
+- `MathSensor` (used by `vt_solar_power`/`pv_total_power` sumOf sensors) now treats a `0xFFFF` register value as missing data instead of summing it in — a transient Modbus glitch returning this sentinel could previously inject a spurious ~65535W spike into the computed total
+
 ## [1.2.5] - 2026-03-11
 
 ### Fixed

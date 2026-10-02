@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Sensor, TempSensor, EnumSensor, BinarySensor } from '../../../src/core/sensors/sensor.js';
+import { Sensor, TempSensor, EnumSensor, BinarySensor, MathSensor } from '../../../src/core/sensors/sensor.js';
 import type { SensorDefinition } from '../../../src/core/sensors/types.js';
 
 describe('Sensor', () => {
@@ -101,6 +101,37 @@ describe('EnumSensor', () => {
     });
     const regs = new Map([[500, 99]]);
     expect(sensor.resolve(regs)).toBe('unknown(99)');
+  });
+});
+
+describe('MathSensor', () => {
+  const def: SensorDefinition = {
+    id: 'vt_solar_power',
+    name: 'VT Solar Power',
+    address: 0,
+    size: 1,
+    factor: 1,
+    unit: 'W',
+    signed: false,
+    sumOf: [674, 678],
+  };
+
+  it('sums raw values from source addresses', () => {
+    const sensor = new MathSensor(def, [674, 678], (vals) => vals.reduce((a, b) => a + b, 0));
+    const regs = new Map([[674, 1200], [678, 800]]);
+    expect(sensor.resolve(regs)).toBe(2000);
+  });
+
+  it('returns null if a source register is missing', () => {
+    const sensor = new MathSensor(def, [674, 678], (vals) => vals.reduce((a, b) => a + b, 0));
+    const regs = new Map([[674, 1200]]);
+    expect(sensor.resolve(regs)).toBeNull();
+  });
+
+  it('treats 0xFFFF sentinel as missing rather than summing garbage', () => {
+    const sensor = new MathSensor(def, [674, 678], (vals) => vals.reduce((a, b) => a + b, 0));
+    const regs = new Map([[674, 1200], [678, 0xffff]]);
+    expect(sensor.resolve(regs)).toBeNull();
   });
 });
 

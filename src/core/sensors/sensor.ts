@@ -179,7 +179,11 @@ export class MathSensor extends Sensor {
     const values: number[] = [];
     for (const addr of this.sourceAddresses) {
       const v = registers.get(addr);
-      if (v === undefined) return null;
+      // 0xFFFF is the Modbus "no data" sentinel some Deye registers return on
+      // a transient read glitch; summing it in would produce a huge spurious
+      // spike (e.g. a false 65535W PV reading), so treat it like a missing
+      // register rather than a real value.
+      if (v === undefined || v === 0xffff) return null;
       values.push(v);
     }
     return this.compute(values);
